@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {NavigationContainer, useTheme} from "@react-navigation/native";
 import {createStackNavigator} from "@react-navigation/stack";
 import {createAppContainer, createSwitchNavigator} from 'react-navigation';
@@ -6,7 +6,9 @@ import {createDrawerNavigator} from "@react-navigation/drawer";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {Button, Icon} from "react-native-elements";
 
-import {Splash, Login, EditProfile} from './screens/core';
+import {ReactReduxContext} from 'react-redux';
+
+import {Splash, Login, EditProfile, Logout} from './screens/core';
 import {Products, ProductDetail, Categories} from './screens/shopping';
 import {Cart, Checkout} from './screens/cart';
 import {Orders, OrderDetail} from './screens/order';
@@ -23,25 +25,22 @@ const Drawer = createDrawerNavigator();
 
 const primaryHeader = {
     headerStyle: {
-        backgroundColor: "#07c",
-        height: 80,
-        borderBottomLeftRadius: 12,
-        borderBottomRightRadius: 12,
+        backgroundColor: "#0077cc10",
     },
     headerTitleStyle: {
-        fontSize: 32,
+        fontSize: 18,
         fontWeight: 'bold',
-        color: "#fff",
+        color: "#0077cc",
     },
 
 
 };
 const homePageHeader = {
     headerStyle: {
-        backgroundColor: "#07c",
+        backgroundColor: "#0077cc",
         height: 80,
-        // borderBottomWidth: 0,
-        borderColor:'#07c',
+        borderBottomWidth: 1,
+        borderBottomColor:"#0077cc",
     },
     cardShadowEnabled: false,
     headerTitleStyle: {
@@ -66,23 +65,23 @@ const homePageHeader = {
 };
 const secondaryHeader = {
     headerStyle: {
-        backgroundColor: "#07c",
+        backgroundColor: "#0077cc10",
         // borderBottomWidth: 0,
-        borderColor:'#07c',
     },
 
     headerTitleStyle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: "#fff",
+        fontSize: 18,
+        fontWeight: '400',
+        color: "#0077cc",
     },
+
 };
 
 
 const ProductStackScreen = () => (
     <ProductStack.Navigator>
-        <ProductStack.Screen headerMode='none' name='Products' component={Products}
-                             options={{...homePageHeader, title: 'Fuse Store'}}/>
+        <ProductStack.Screen name='Products' component={Products}
+                             options={{...homePageHeader, title: 'Fuse  Store'}}/>
         <ProductStack.Screen name='ProductDetail' component={ProductDetail}
                              options={{...secondaryHeader, title: 'Product Details'}}/>
         <ProductStack.Screen name='Categories' component={Categories}
@@ -93,8 +92,6 @@ const ProductStackScreen = () => (
 
 const LoginStackScreen = () => (
     <LoginStack.Navigator>
-        <LoginStack.Screen name='Splash' component={Splash}
-                           options={{...primaryHeader, title: ''}}/>
         <LoginStack.Screen name='Login' component={Login}
                            options={{...secondaryHeader, title: 'Login'}}/>
     </LoginStack.Navigator>
@@ -106,7 +103,7 @@ const CartStackScreen = () => (
         <CartStack.Screen name='Cart' component={Cart}
                           options={{...primaryHeader, title: 'Cart'}}/>
         <CartStack.Screen name='ProductDetail' component={ProductDetail}
-                          options={{...primaryHeader, title: 'Product'}}/>
+                          options={{...secondaryHeader, title: 'Product'}}/>
         <CartStack.Screen name='Checkout' component={Checkout}
                           options={{...secondaryHeader, title: 'Checkout'}}/>
     </CartStack.Navigator>
@@ -132,22 +129,41 @@ const DrawerScreen = () => (
     >
         <Drawer.Screen name='Home' component={ProductStackScreen}/>
         <Drawer.Screen name='Cart' component={CartStackScreen}/>
-        <Drawer.Screen name='Categories' component={Categories}/>
-        <Drawer.Screen name='MyOrders' component={OrderStackScreen}/>
-        <Drawer.Screen name='About' component={ProductStackScreen}/>
-        <Drawer.Screen name='Logout' component={ProductStackScreen}/>
+        {/*<Drawer.Screen name='Categories' component={Categories}/>*/}
+        <Drawer.Screen name='MyOrders' component={OrderStackScreen} options={{title:'My Orders'}}/>
+        <Drawer.Screen name='Settings' component={ProductStackScreen}/>
+        <Drawer.Screen name='Logout' component={Logout}/>
     </Drawer.Navigator>
 )
 
-export default () => {
-    const [isLoading, setIsLoading] = React.useState(true);
-    React.useEffect(()=>{
-        setTimeout(()=>setIsLoading(!isLoading), 500)
-    }, [])
+function useStore() {
+    const { store } = useContext(ReactReduxContext);
+    const { getState, dispatch, subscribe } = store;
 
+    const [ storeState, setStoreState ] = useState(getState());
+
+    useEffect(() => subscribe(() => {
+        setStoreState(getState());
+    }, []));
+
+    return [storeState, dispatch];
+}
+
+
+
+// to navigate from redux actions
+export const navigationRef = React.createRef();
+export function navigate(name, params) {
+    navigationRef.current?.navigate(name, params);
+}
+
+export default () => {
+    const [state, dispatch] = useStore()
+    const isAuthenticated=state.auth.isAuthenticated;
+    const isLoading=state.auth.isLoading;
     return (
-        <NavigationContainer theme={theme}>
-            {isLoading?<Splash/>:<DrawerScreen/>}
+        <NavigationContainer theme={theme} ref={navigationRef}>
+            {isLoading?<Splash/>:isAuthenticated?<DrawerScreen/>:<LoginStackScreen/>}
         </NavigationContainer>
     )
 }

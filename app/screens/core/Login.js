@@ -1,17 +1,42 @@
 import React from 'react';
-import {StyleSheet, View, Text, Image, TextInput, ScrollView} from 'react-native';
+import {StyleSheet, View, Text, Image, TextInput, ScrollView, KeyboardAvoidingView} from 'react-native';
 import links from "../../configs/links";
 import colors from "../../configs/colors";
 import {Button} from "react-native-elements";
 
+import {connect} from 'react-redux';
+import {bindActionCreators} from "redux";
+import * as Actions from '../../store/actions/auth.actions';
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            mobile:'',
+            otp:'',
+        }
         this.props.navigation.setOptions({
             headerShown: false
         })
     }
+
+    _changeMobileNumber = num =>{
+        this.setState({mobile:num});
+        console.log(num);
+    }
+
+    _changeOTP = otp =>{
+        this.setState({otp:otp});
+        console.log(otp)
+    }
+
     render() {
+        const {isAuthenticated, isOTPSent, actions, isVerifying, isOTPSending} = this.props;
+        if(isAuthenticated===true){
+            this.props.navigation.navigate('Home');
+        }
+
+
         return (
             <View style={styles.container}>
                 <Image style={styles.image} source={{uri:links.milk}} resizeMode={"cover"}/>
@@ -21,11 +46,31 @@ class Login extends React.Component {
                 <Text style={styles.title}>
                     Login
                 </Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Mobile Number"
-                />
-                <Button title={"Login"} titleStyle={{fontSize:20}} buttonStyle={styles.placeOrderButton}/>
+                {!isOTPSent?
+                    <KeyboardAvoidingView>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Mobile Number"
+                            value={this.state.mobile}
+                            onChangeText={this._changeMobileNumber}
+
+                        />
+                        <Button title={"Send OTP"} loading={isOTPSending} onPress={()=>actions.sendOTP(this.state.mobile)} titleStyle={{fontSize:20}} buttonStyle={styles.placeOrderButton}/>
+                    </KeyboardAvoidingView>
+                    :
+                    <KeyboardAvoidingView>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter OTP"
+                            value={this.state.otp}
+                            onChangeText={this._changeOTP}
+                        />
+                        <Button title={"Verify OTP"} loading={isVerifying} onPress={()=>actions.verifyOTP(this.state.mobile, this.state.otp)} titleStyle={{fontSize:20}} buttonStyle={styles.placeOrderButton}/>
+                    </KeyboardAvoidingView>
+                }
+
+
+
 
 
             </View>
@@ -79,7 +124,21 @@ const styles = StyleSheet.create({
         marginTop:10,
         backgroundColor: colors.primary,
     }
-
 });
 
-export default Login;
+const mapStateToProps = state => ({
+    isOTPSent: state.auth.isOTPSent,
+    isAuthenticated:state.auth.isAuthenticated,
+    isVerifying: state.auth.isVerifying,
+    isOTPSending: state.auth.isOTPSending,
+
+})
+
+const mapDispatchToProps = dispatch => ({
+    actions:bindActionCreators({
+        sendOTP:Actions.sendOTP,
+        verifyOTP:Actions.verifyOTP,
+    }, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

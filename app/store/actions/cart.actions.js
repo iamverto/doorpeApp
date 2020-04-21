@@ -1,3 +1,5 @@
+import {API_BASE_URL} from "../../api/constants";
+
 export const GET_CART_ITEMS = "[CART] GET CART ITEMS";
 
 export const ADD_TO_CART_START = "[CART] ADD TO CART START";
@@ -6,14 +8,22 @@ export const ADD_TO_CART_FAILED = "[CART] ADD TO CART FAILED";
 
 export const SET_CART_ITEM_QUANTITY = "[CART] SET CART ITEM QUANTITY";
 export const SET_CART_ITEM_QUANTITY_DELETED = "[CART] SET CART ITEM QUANTITY DELETED";
+import axios from 'axios';
+import {API} from "react-native-web/dist/vendor/react-native/Animated/NativeAnimatedHelper";
+import Snackbar from 'react-native-snackbar';
 
 
 export const getCartItems = () => {
     return dispatch => {
-        return dispatch({
-            type: GET_CART_ITEMS,
-            payload: [{id: 1, product: '', q: 1, price: 23},]
-        })
+        axios.get(API_BASE_URL + 'cart/items')
+            .then(res => {
+                console.log(res.data)
+                return dispatch({
+                    type: GET_CART_ITEMS,
+                    payload: res.data.results
+                })
+            })
+            .catch(err => console.log(err))
     }
 }
 
@@ -22,13 +32,22 @@ export const addToCart = (productId) => {
         dispatch({
             type: ADD_TO_CART_START,
         })
-        setTimeout(() => {
-            return dispatch({
-                type: ADD_TO_CART_SUCCESS,
-                payload: {id: productId, product: '', q: 1, price: 233}
-            })
-        }, 300)
 
+        axios.post(API_BASE_URL + 'cart/items', {
+            product: productId
+        })
+            .then(res => {
+                Snackbar.show({
+                    text: 'Hello world',
+                    duration: Snackbar.LENGTH_SHORT,
+                })
+                return dispatch({
+                    type: ADD_TO_CART_SUCCESS,
+                    payload: res.data
+                })
+
+            })
+            .catch(err => console.log(err))
     }
 }
 
@@ -36,14 +55,25 @@ export const setQuantity = (itemId, quantity) => {
     return dispatch => {
         // if quantity === 0 then delete it
         if (quantity === 0) {
-            return dispatch({
-                type: SET_CART_ITEM_QUANTITY_DELETED,
-                payload: {id: itemId, product: 1, q: quantity}
-            })
+            axios.delete(API_BASE_URL + 'cart/items/' + itemId)
+                .then(res=>{
+                    return dispatch({
+                        type: SET_CART_ITEM_QUANTITY_DELETED,
+                        payload: {id: itemId, product: 1, title: "ww", quantity: 4}
+                    })
+                })
+                .catch(err=>console.log(err))
+        } else {
+            axios.patch(API_BASE_URL + 'cart/items/' + itemId, {
+                quantity: quantity
+            }).then(res => {
+                console.log(res.data);
+                return dispatch({
+                    type: SET_CART_ITEM_QUANTITY,
+                    payload: res.data
+                })
+            }).catch(err => console.log(err))
+
         }
-        return dispatch({
-            type: SET_CART_ITEM_QUANTITY,
-            payload: {id:itemId, product: 1, q: quantity},
-        })
     }
 }

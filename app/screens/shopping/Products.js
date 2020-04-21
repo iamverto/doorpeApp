@@ -17,6 +17,12 @@ class Products extends React.Component {
 
     constructor(props) {
         super(props);
+        const {actions} = this.props;
+        this.timer = setInterval(()=>{
+            actions.getProducts();
+            actions.getCartItems();
+        }, 30*1000);
+
         this.props.navigation.setOptions({
             headerRight: () => (this._renderCartIcon()),
             headerLeft: () => (
@@ -28,6 +34,12 @@ class Products extends React.Component {
             )
         });
     }
+
+    componentWillUnmount() {
+        clearInterval(this.timer)
+        this.timer = null;
+    }
+
 
     _renderCartIcon = () => {
         const {cartItems} = this.props;
@@ -45,7 +57,7 @@ class Products extends React.Component {
                         />
                     </View>
                 }
-                onPress={() => this.props.navigation.navigate('Cart')}
+                onPress={() => this.props.navigation.navigate('Cart', {screen:'Cart'})}
 
             />
         )
@@ -61,12 +73,12 @@ class Products extends React.Component {
 
     componentDidMount() {
         const {products, cartItems, actions} = this.props;
-        console.log(cartItems);
         actions.getProducts();
+        actions.getCartItems();
     }
 
-    _goToProduct = () => {
-        this.props.navigation.push('ProductDetail');
+    _goToProduct = (product) => {
+        this.props.navigation.push('ProductDetail', {productId:product.id});
     }
 
     render() {
@@ -101,7 +113,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
     },
     product: {
-        padding: 10,
+        padding: 5,
         width: '50%',
     }
 });
@@ -115,7 +127,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators({
         getProducts: Actions.getProducts,
-        addToCart: CartActions.addToCart
+        addToCart: CartActions.addToCart,
+        getCartItems:CartActions.getCartItems
     }, dispatch)
 })
 

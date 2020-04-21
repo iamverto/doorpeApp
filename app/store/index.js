@@ -1,11 +1,17 @@
 import {createStore, combineReducers, applyMiddleware} from "redux";
 import thunk from 'redux-thunk';
-import {ProductReducer, CartReducer} from "./reducers";
+import {ProductReducer, CartReducer, CheckoutReducer, OrderReducer, AuthReducer} from "./reducers";
 // import {persistStore, persistReducer} from 'redux-persist';
 import {AsyncStorage} from "react-native";
 
 const rootReducer = combineReducers(
-    {product:ProductReducer, cart:CartReducer}
+    {
+        product: ProductReducer,
+        cart: CartReducer,
+        checkout:CheckoutReducer,
+        order:OrderReducer,
+        auth:AuthReducer,
+    }
 );
 
 // const persistConfig = {
@@ -22,22 +28,6 @@ const ConfigureStore = (onComplete) => {
 export default ConfigureStore;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
 
 
@@ -48,22 +38,22 @@ SCREEN
 > get user      token>get_user
 > set user      set token
 > logout        remove token
-> toggle sidebar
+toggle sidebar
 
 # PRODUCTS
-> get products      /products
+get products      /products
 > sort products     /products _getSorted()
 > search products   /products?search=?
 > get cart items    /cart/items
 
 
 # PRODUCT DETAIL
-> get product
+get product
 
 # CART
-> get cart items
-> set quantity
-> add to cart
+get cart items
+set quantity
+add to cart
 
 
 # CHECKOUT

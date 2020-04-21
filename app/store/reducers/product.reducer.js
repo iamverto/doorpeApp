@@ -2,10 +2,7 @@ import * as Actions from '../actions/product.actions';
 import {ArrayToObject} from "../../api/helper";
 
 const INITIAL_STATE = {
-    products: {
-        1:{id: 1, name: 'Product 1', price: 3},
-        4:{id: 4, name: 'Product 1', price: 3},
-    },
+    products: {},
     isLoading: false,
 }
 
@@ -18,9 +15,12 @@ const productReducer = (state = INITIAL_STATE, action) => {
             const products = ArrayToObject(action.payload, 'id');
             return {...state,isLoading:false, products: {...state.products, ...products}};
 
-        case Actions.GET_PRODUCTS_ERROR:
+        case Actions.GET_PRODUCTS_FAILED:
             return {...state, isLoading: false};
 
+        case Actions.GET_PRODUCT:
+            const product = ArrayToObject([action.payload], 'id');
+            return {...state,isLoading:false, products: {...state.products, ...product}};
         default:
             return state;
     }
@@ -33,4 +33,9 @@ export default productReducer;
 
 export const getProducts =(state)=>{
     return Object.values(state.product.products)
+}
+
+export const getProduct = (state, productId)=>{
+    const products = state.product.products;
+    return products[productId];
 }

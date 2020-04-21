@@ -1,21 +1,50 @@
+import {API_BASE_URL} from "../../api/constants";
+
 export const GET_PRODUCTS_START = "[PRODUCT] GET PRODUCTS START";
 export const GET_PRODUCTS_SUCCESS = "[PRODUCT] GET PRODUCTS SUCCESS";
-export const GET_PRODUCTS_ERROR = "[PRODUCT] GET PRODUCTS ERROR";
+export const GET_PRODUCTS_FAILED = "[PRODUCT] GET PRODUCTS FAILED";
 
+export const GET_PRODUCT = "[PRODUCT] GET PRODUCT";
 
-export const getProducts = (search = null, sortBY=null) => {
+import axios from 'axios';
+
+export const getProducts = (search = null, sortBY = null) => {
     return dispatch => {
-        dispatch({
-            type: GET_PRODUCTS_START,
-        })
-        //make api call here
-
-        setTimeout(() => {
-            return dispatch({
-                type: GET_PRODUCTS_SUCCESS,
-                payload: [{id: 3, name: 'Product 3', price: 3}, {id: 2, name: 'Product 2', price: 11},]
+        console.log('----')
+        // dispatch({
+        //     type: GET_PRODUCTS_START,
+        // })
+        axios.get(API_BASE_URL + 'products')
+            .then(res => {
+                return dispatch({
+                    type: GET_PRODUCTS_SUCCESS,
+                    payload: res.data.results
+                })
             })
-        }, 500)
+            .catch(err => {
+                console.log("fetching product er")
+                console.log(err)
+                return dispatch({
+                    type: GET_PRODUCTS_FAILED,
+                })
+            })
+    }
+}
+
+/*
+* logic
+* fetch from what already have
+* then fetch from api and update it
+* */
+export const getProduct = (productId) => {
+    return dispatch => {
+        axios.get(API_BASE_URL + 'products/' + productId)
+            .then(res => {
+                return dispatch({
+                    type: GET_PRODUCT,
+                    payload: res.data
+                })
+            })
     }
 }
 

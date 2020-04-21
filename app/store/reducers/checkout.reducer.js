@@ -8,12 +8,16 @@ const INITIAL_STATE = {
         pincode:'',
         city:'',
         street:'',
-    }
+    },
+    cities:['Jalandhar', 'New Delhi']
 }
 
 const checkoutReducer = (state=INITIAL_STATE, action)=>{
     switch (action.type) {
         case Actions.PLACE_ORDER_START:
+            return {...state, isProcessing: true}
+
+        case Actions.PLACE_ORDER_FAILED:
             return {...state, isProcessing: true}
 
         case Actions.PLACE_ORDER_SUCCESS:

@@ -2,18 +2,14 @@ import * as Actions from '../actions/cart.actions';
 import {ArrayToObject} from '../../api/helper';
 
 const INITIAL_STATE = {
-    cartItems: {
-        1: {id: 1, product: '', q: 1, price: 233}
-    },
-    subtotal: 123,
+    cartItems: {},
 }
 
 const cartReducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
         case Actions.GET_CART_ITEMS:
             const items = ArrayToObject(action.payload, 'id')
-            // todo update subtotal
-            return {...state, cartItems: {...state.cartItems, ...items}}
+            return {...state, cartItems: items}
 
         case Actions.ADD_TO_CART_SUCCESS:
             const item = ArrayToObject([action.payload], 'id')
@@ -44,3 +40,13 @@ export const getCartItems = (state) => {
     const items = state.cart.cartItems;
     return Object.values(items);
 }
+
+export const getSubtotal = (state) => {
+    let items = state.cart.cartItems;
+    let subtotal = 0;
+    items = Object.values(items);
+    items.map(item=>subtotal=subtotal+(item.price*item.quantity))
+    return subtotal;
+}
+
+

@@ -12,24 +12,36 @@ class ProductCard extends React.Component {
 
     render() {
         const {goToProduct, addToCart, product} = this.props;
-        return (
-            <View style={styles.box}>
-                <View>
-                    <Image
-                        style={styles.image}
-                        source={{uri: links.product}}
-                        resizeMode='contain'
-                    />
-                    <Text onPress={()=>goToProduct()} style={styles.title}>
-                        MILK for Gaining Weight
-                    </Text>
 
-                </View>
-                <View style={styles.meta}>
-                    <Text style={styles.price}>$799</Text>
-                    <Button
-                        onPress={()=>addToCart(product.id)}
-                        buttonStyle={styles.addButton} icon={<Icon color="#fff" name='add'/>} type='clear'/>
+        return (
+            <View>
+                {!product.in_stock && (
+                    <View style={[styles.box,styles.overlay]}>
+                        <Text style={{textAlign:'center'}}>Out of stock</Text>
+                    </View>
+                )}
+                <View style={styles.box}>
+
+                    <View>
+                        {product.product_pics.length>0 && (
+                            <Image
+                                style={styles.image}
+                                source={{uri: product.product_pics[0].pic}}
+                                resizeMode='contain'
+                            />
+
+                        )}
+                        <Text onPress={() => goToProduct(product)} style={styles.title}>
+                            {product.name}
+                        </Text>
+
+                    </View>
+                    <View style={styles.meta}>
+                        <Text style={styles.price}>Rs. {product.current_price}</Text>
+                        <Button
+                            onPress={() => addToCart(product.id)}
+                            buttonStyle={styles.addButton} icon={<Icon size={28} color="#fff" name='add'/>} type='clear'/>
+                    </View>
                 </View>
             </View>
         );
@@ -37,14 +49,34 @@ class ProductCard extends React.Component {
 }
 
 const styles = StyleSheet.create({
+
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignContent: 'center',
+        position: 'absolute',
+        zIndex: 44,
+        width: '100%',
+        height: '100%',
+        borderColor: "#eee",
+        backgroundColor: "#fff",
+        opacity:.7
+
+    },
+
     box: {
         width: '100%',
         flexDirection: 'column',
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: colors.primary,
-        backgroundColor: "#fff",
+        borderColor: "#0077cc30",
+        backgroundColor: "#ffffff",
         padding: 10,
+        elevation:5,
+        shadowColor: '#ccc',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.5,
+        shadowRadius: 3,
         // boxShadow: "0px 0px 3px 3px #77d3c330",
     },
     image: {

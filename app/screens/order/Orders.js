@@ -5,15 +5,41 @@ import links from "../../configs/links";
 import {Badge, Button, Icon} from "react-native-elements";
 import colors from "../../configs/colors";
 
+
+import {connect} from 'react-redux';
+import * as Actions from '../../store/actions/order.actions';
+import {bindActionCreators} from "redux";
+import {getOrder, getOrders} from '../../store/reducers/order.reducer';
+import {or} from "react-native-reanimated";
+
+
 class Orders extends React.Component {
+    constructor(props) {
+        super(props);
+        this.props.navigation.setOptions({
+            headerRight: () => (
+                <Button
+                    type='clear'
+                    title={'back'}
+                    onPress={() => this.props.navigation.navigate('Home')}
+                />
+            ),
+            headerLeft: () => (
+                <Button
+                    type='clear'
+                    icon={<Icon size={32} name='ios-menu' type='ionicon' color='#07c'/>}
+                    onPress={() => this.props.navigation.toggleDrawer()}
+                />
+            )
+        });
+
+    }
     render() {
+        const {orders, actions} = this.props;
         return (
             <ScrollView style={commons.container}>
-                <Text style={styles.title}>
-                    Your Orders
-                </Text>
                 <View style={styles.orderContainer}>
-                    {[1,2,3,4,5,6,7].map(p=>{
+                    {orders.map(order=>{
                         return(
 
                             <View style={styles.orderItem}>
@@ -23,7 +49,7 @@ class Orders extends React.Component {
                                     style={styles.image}/>
                                 <View style={styles.orderItemMeta}>
                                     <View style={styles.orderItemText}>
-                                        <Text style={styles.itemTitle} onPress={()=>this.props.navigation.push('OrderDetail')}>Order #2</Text>
+                                        <Text style={styles.itemTitle} onPress={()=>this.props.navigation.push('OrderDetail', {orderId:(order.id)})}>Order #2</Text>
                                         <Text style={styles.itemPrice}>$799</Text>
                                     </View>
                                     <View style={styles.orderItemButtons}>
@@ -107,5 +133,14 @@ const styles = StyleSheet.create({
 
 });
 
+const mapStateToProps = state => ({
+    orders:getOrders(state),
+})
 
-export default Orders;
+const mapDispatchToProps = dispatch => ({
+    actions:bindActionCreators({
+        getOrders:Actions.getOrders
+    }, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Orders);
