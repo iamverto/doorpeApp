@@ -8,6 +8,8 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 import * as Actions from '../../store/actions/auth.actions';
 
+
+
 class Login extends React.Component {
     constructor(props) {
         super(props);
@@ -68,8 +70,6 @@ class Login extends React.Component {
                         <Button title={"Verify OTP"} loading={isVerifying} onPress={()=>actions.verifyOTP(this.state.mobile, this.state.otp)} titleStyle={{fontSize:20}} buttonStyle={styles.placeOrderButton}/>
                     </KeyboardAvoidingView>
                 }
-
-
 
 
 

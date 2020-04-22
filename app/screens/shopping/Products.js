@@ -21,7 +21,7 @@ class Products extends React.Component {
         this.timer = setInterval(()=>{
             actions.getProducts();
             actions.getCartItems();
-        }, 30*1000);
+        }, 100*1000);
 
         this.props.navigation.setOptions({
             headerRight: () => (this._renderCartIcon()),
@@ -128,7 +128,7 @@ const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators({
         getProducts: Actions.getProducts,
         addToCart: CartActions.addToCart,
-        getCartItems:CartActions.getCartItems
+        getCartItems:CartActions.getCartItems,
     }, dispatch)
 })
 

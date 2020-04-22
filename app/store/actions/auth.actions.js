@@ -16,6 +16,11 @@ export const VERIFY_OTP_SUCCESS = "[AUTH] VERIFY OTP SUCCESS";  // login
 
 export const LOGOUT = "[AUTH] LOGOUT";
 export const UPDATE_ADDRESS = "[AUTH] UPDATE ADDRESS";
+import {showMessage, hideMessage} from "react-native-flash-message";
+import {Icon} from "react-native-elements";
+import React from "react";
+import colors from "../../configs/colors";
+
 
 export const getUser = () => {
     return async dispatch => {
@@ -30,7 +35,10 @@ export const getUser = () => {
             axios.defaults.headers.common['Authorization'] = "Bearer " + token;
             axios.get(API_BASE_URL + 'auth/user')
                 .then(res => {
-                    console.log(res.data)
+                    showMessage({
+                        message: "Login Successful!",
+                        type: "success",
+                    });
                     AsyncStorage.setItem('FuseAuthToken', res.data.token);
                     dispatch({
                         type: GET_USER_SUCCESS,
@@ -39,7 +47,10 @@ export const getUser = () => {
                 })
                 .catch(err => {
                     AsyncStorage.removeItem('FuseAuthToken');
-                    console.log(err)
+                    showMessage({
+                        message: "Login!",
+                        type: "warning",
+                    });
                     dispatch({
                         type: GET_USER_FAILED,
                     })
@@ -66,11 +77,18 @@ export const sendOTP = (mobile) => {
             mobile: mobile
         })
             .then(res => {
+                showMessage({
+                    message: "OTP has been sent!",
+                    type: "info",
+                });
+
                 return dispatch({
                     type: SEND_OTP_SUCCESS,
                 })
             })
             .catch(err => {
+                showMessage({ message: "OTP Sending failed!", type: "danger",});
+
                 return dispatch({
                     type: SEND_OTP_FAILED,
                 })
@@ -91,13 +109,13 @@ export const verifyOTP = (mobile, otp) => {
         }).then(res => {
             AsyncStorage.setItem('FuseAuthToken', res.data.access_token);
             axios.defaults.headers.common['Authorization'] = "Bearer " + res.data.access_token;
-            console.log(res.data)
+            showMessage({ message: "Login Success", type: "success",});
             return dispatch({
                 type: VERIFY_OTP_SUCCESS,
                 payload: res.data
             })
         }).catch(err => {
-            console.log(err)
+            showMessage({ message: "Wrong OTP", type: "danger",});
             return dispatch({
                 type: VERIFY_OTP_FAILED,
             })
@@ -116,7 +134,7 @@ export const logout = () => {
 
 export const updateAddress = (city, street, pincode) => {
     return dispatch({
-        type:UPDATE_ADDRESS,
-        payload:{city:city, street:street, pincode:pincode}
+        type: UPDATE_ADDRESS,
+        payload: {city: city, street: street, pincode: pincode}
     })
 }

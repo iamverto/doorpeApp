@@ -1,18 +1,38 @@
+import {API_BASE_URL} from "../../api/constants";
+
 export const GET_ORDERS = "[ORDERS] GET ORDERS";
 export const GET_ORDER_DETAIL = "[ORDERS] GET ORDER DETAIL";
 
-export const getOrders = () => dispatch => {
+import axios from 'axios';
+
+export const getOrders = () => {
     // make an api call
-    return dispatch({
-        type:GET_ORDERS,
-        payload:[{id:1, amount:445}]
-    })
+    return dispatch => {
+        axios.get(API_BASE_URL + 'orders')
+            .then(res => {
+                console.log(res.data.results);
+                return dispatch({
+                    type: GET_ORDERS,
+                    payload: res.data.results
+                })
+
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+    }
 }
 
 export const getOrderDetail = orderId => dispatch => {
     // make an api call
-    return dispatch({
-        type:GET_ORDER_DETAIL,
-        payload:{id:1, amount:445}
-    })
+    axios.get(API_BASE_URL + 'orders/' + orderId)
+        .then(res => {
+            console.log(res.data);
+            return dispatch({
+                type: GET_ORDER_DETAIL,
+                payload: res.data
+            })
+
+        })
 }

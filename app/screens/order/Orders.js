@@ -9,7 +9,7 @@ import colors from "../../configs/colors";
 import {connect} from 'react-redux';
 import * as Actions from '../../store/actions/order.actions';
 import {bindActionCreators} from "redux";
-import {getOrder, getOrders} from '../../store/reducers/order.reducer';
+import {getOrder, getOrdersList} from '../../store/reducers/order.reducer';
 import {or} from "react-native-reanimated";
 
 
@@ -34,27 +34,37 @@ class Orders extends React.Component {
         });
 
     }
+
+    componentDidMount() {
+        const {actions} = this.props;
+        actions.getOrders();
+
+    }
+
+
     render() {
         const {orders, actions} = this.props;
         return (
             <ScrollView style={commons.container}>
                 <View style={styles.orderContainer}>
-                    {orders.map(order=>{
-                        return(
+                    {orders.map(order => {
+                        return (
 
                             <View style={styles.orderItem}>
-                                <Image
-                                    source={{uri:links.product}}
-                                    resizeMode={"contain"}
-                                    style={styles.image}/>
+                                {/*<Image*/}
+                                {/*    source={{uri: links.product}}*/}
+                                {/*    resizeMode={"contain"}*/}
+                                {/*    style={styles.image}/>*/}
                                 <View style={styles.orderItemMeta}>
                                     <View style={styles.orderItemText}>
-                                        <Text style={styles.itemTitle} onPress={()=>this.props.navigation.push('OrderDetail', {orderId:(order.id)})}>Order #2</Text>
-                                        <Text style={styles.itemPrice}>$799</Text>
+                                        <Text style={styles.itemTitle}
+                                              onPress={() => this.props.navigation.push('OrderDetail', {orderId: (order.id)})}>Order
+                                            #{order.id}</Text>
+                                        <Text style={styles.itemPrice}>Rs. {order.amount}</Text>
                                     </View>
                                     <View style={styles.orderItemButtons}>
-                                        <Text style={styles.itemQuantity}>3</Text>
-                                        <Text style={styles.status}>Dispatched</Text>
+                                        <Text style={styles.itemQuantity}> </Text>
+                                        <Text style={styles.status}>{order.status}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -68,78 +78,77 @@ class Orders extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    title:{
+    title: {
         fontWeight: 'bold',
         fontSize: 24,
         padding: 10,
         color: colors.dark,
     },
 
-    orderContainer:{
-        flexDirection:'column',
+    orderContainer: {
+        flexDirection: 'column',
     },
-    orderItem:{
+    orderItem: {
         flexDirection: 'row',
-        borderTopWidth:1,
-        borderColor:colors.primary
+        borderBottomWidth: 1,
+        borderColor: colors.primary
     },
-    image:{
-        width:100,
-        height:100,
-        borderRadius:12,
-        margin:5
+    image: {
+        width: 100,
+        height: 100,
+        borderRadius: 12,
+        margin: 5
     },
-    orderItemMeta:{
-        padding:5,
-        flex:1,
-        flexDirection:'column',
-        justifyContent:'space-around'
+    orderItemMeta: {
+        padding: 5,
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-around'
 
     },
-    orderItemText:{
-    },
-    itemTitle:{
-        fontSize:16,
+    orderItemText: {},
+    itemTitle: {
+        fontSize: 16,
         fontWeight: '500',
-        color:colors.dark
+        color: colors.dark
     },
-    itemPrice:{
-        fontSize:16,
+    itemPrice: {
+        fontSize: 16,
         paddingTop: 10,
-        fontWeight:'bold'
+        fontWeight: 'bold'
     },
-    orderItemButtons:{
-        flexDirection:'row',
+    orderItemButtons: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
         paddingRight: 10,
     },
-    itemQuantity:{
-        fontSize:18,
-        paddingLeft:10,
-        paddingRight:10,
-        paddingTop:2,
+    itemQuantity: {
+        fontSize: 18,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingTop: 2,
     },
-    status:{
-        padding:5,
-        borderRadius:12,
+    status: {
+        padding: 5,
+        borderRadius: 12,
         backgroundColor: colors.dark,
-        color:"#fff",
+        color: "#fff",
     },
-    itemButton:{
+    itemButton: {
         padding: 0,
         borderRadius: 100,
-        backgroundColor:colors.primary
+        backgroundColor: colors.primary
     }
 
 });
 
 const mapStateToProps = state => ({
-    orders:getOrders(state),
+    orders: getOrdersList(state),
 })
 
 const mapDispatchToProps = dispatch => ({
-    actions:bindActionCreators({
-        getOrders:Actions.getOrders
+    actions: bindActionCreators({
+        getOrders: Actions.getOrders
     }, dispatch)
 })
 

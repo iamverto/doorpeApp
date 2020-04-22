@@ -9,34 +9,39 @@ import {getCartItems} from '../actions/cart.actions';
 
 import axios from 'axios';
 import {API_BASE_URL} from "../../api/constants";
+import {showMessage} from "react-native-flash-message";
 
 export const GET_CITIES = "[CHECKOUT] GET CITIES";
 
-export const placeOrder=(fullname, city, street, pincode)=>{
-    return dispatch =>{
+export const placeOrder = (fullname, city, street, pincode) => {
+    return dispatch => {
         dispatch({
-            type:PLACE_ORDER_START,
+            type: PLACE_ORDER_START,
+        });
+        return axios.post(API_BASE_URL + 'orders/place-order', {
+            fullname: fullname,
+            city: city,
+            street: street,
+            pincode: pincode
         })
-        axios.post(API_BASE_URL+'orders/place-order', {
-            fullname:fullname,
-            city:city,
-            street:street,
-            pincode:pincode
-        })
-            .then(res=>{
-                dispatch(getCartItems());
-                console.log('order placed')
-                dispatch(navigate('MyOrders'));
-                return dispatch({
-                    type:PLACE_ORDER_SUCCESS,
-                    payload:{id:4},
+            .then(res => {
+                showMessage({message: "Order Success!", duration: '3000', type: "success", position: 'bottom'});
+                dispatch({
+                    type: PLACE_ORDER_SUCCESS,
+                    payload: res.data,
                 })
-
             })
-            .catch(err=>{
+            .then(() => {
+                dispatch(getCartItems())
+            })
+            .then((res) => {
+                navigate('MyOrders')
+            })
+            .catch(err => {
                 console.log(err)
-                return dispatch({
-                    type:PLACE_ORDER_FAILED
+                showMessage({message: "Order Failed!", duration: '3000', type: "danger", position: 'bottom'});
+                dispatch({
+                    type: PLACE_ORDER_FAILED
                 })
             })
     }

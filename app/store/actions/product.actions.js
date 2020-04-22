@@ -10,10 +10,9 @@ import axios from 'axios';
 
 export const getProducts = (search = null, sortBY = null) => {
     return dispatch => {
-        console.log('----')
-        // dispatch({
-        //     type: GET_PRODUCTS_START,
-        // })
+        dispatch({
+            type: GET_PRODUCTS_START,
+        })
         axios.get(API_BASE_URL + 'products')
             .then(res => {
                 return dispatch({
@@ -22,8 +21,6 @@ export const getProducts = (search = null, sortBY = null) => {
                 })
             })
             .catch(err => {
-                console.log("fetching product er")
-                console.log(err)
                 return dispatch({
                     type: GET_PRODUCTS_FAILED,
                 })

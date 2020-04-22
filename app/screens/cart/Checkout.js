@@ -51,21 +51,21 @@ class Checkout extends React.Component {
 
 
     render() {
-        const {user, cities, actions} = this.props;
+        const {user, cities, actions, items, subTotal} = this.props;
         return (
             <ScrollView style={commons.container}>
                 <Text style={styles.title}>
                     Checkout
                 </Text>
                 <View style={styles.checkoutContainer}>
-                    {[1, 2, 3, 4, 5, 6].map(p => {
+                    {items.map(item => {
                         return (
                             <View style={styles.item}>
                                 <Text style={styles.itemTitle}>
-                                    Stone breaker for trekking shoes
+                                    {item.title}
                                 </Text>
                                 <Text style={styles.itemMeta}>
-                                    $123*23=$323.00
+                                    Rs. {item.price} x {item.quantity} = Rs. {item.price*item.quantity}
                                 </Text>
                             </View>
                         )
@@ -75,7 +75,7 @@ class Checkout extends React.Component {
                             SubTotal
                         </Text>
                         <Text style={styles.subTotal}>
-                            $323.00
+                            Rs. {subTotal}
                         </Text>
                     </View>
                 </View>
@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
     items: CheckoutSelectors.getCheckoutItems(state),
+    subTotal: CheckoutSelectors.getCheckoutSubtotal(state),
     user: state.auth.user,
     cities: state.checkout.cities,
 

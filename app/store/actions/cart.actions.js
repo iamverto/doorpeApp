@@ -9,15 +9,14 @@ export const ADD_TO_CART_FAILED = "[CART] ADD TO CART FAILED";
 export const SET_CART_ITEM_QUANTITY = "[CART] SET CART ITEM QUANTITY";
 export const SET_CART_ITEM_QUANTITY_DELETED = "[CART] SET CART ITEM QUANTITY DELETED";
 import axios from 'axios';
-import {API} from "react-native-web/dist/vendor/react-native/Animated/NativeAnimatedHelper";
-import Snackbar from 'react-native-snackbar';
+import {showMessage} from "react-native-flash-message";
 
 
 export const getCartItems = () => {
     return dispatch => {
         axios.get(API_BASE_URL + 'cart/items')
             .then(res => {
-                console.log(res.data)
+
                 return dispatch({
                     type: GET_CART_ITEMS,
                     payload: res.data.results
@@ -37,10 +36,7 @@ export const addToCart = (productId) => {
             product: productId
         })
             .then(res => {
-                Snackbar.show({
-                    text: 'Hello world',
-                    duration: Snackbar.LENGTH_SHORT,
-                })
+                showMessage({message: "Added to cart!", duration: '800', type: "success", position: 'bottom', backgroundColor:"#07c"});
                 return dispatch({
                     type: ADD_TO_CART_SUCCESS,
                     payload: res.data
@@ -56,13 +52,13 @@ export const setQuantity = (itemId, quantity) => {
         // if quantity === 0 then delete it
         if (quantity === 0) {
             axios.delete(API_BASE_URL + 'cart/items/' + itemId)
-                .then(res=>{
+                .then(res => {
                     return dispatch({
                         type: SET_CART_ITEM_QUANTITY_DELETED,
                         payload: {id: itemId, product: 1, title: "ww", quantity: 4}
                     })
                 })
-                .catch(err=>console.log(err))
+                .catch(err => console.log(err))
         } else {
             axios.patch(API_BASE_URL + 'cart/items/' + itemId, {
                 quantity: quantity

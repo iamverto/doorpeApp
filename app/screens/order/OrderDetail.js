@@ -10,26 +10,28 @@ import {getOrder} from '../../store/reducers/order.reducer';
 class OrderDetail extends React.Component {
 
     componentDidMount() {
-        const {actions, order} = this.props;
+        const {actions, order, user} = this.props;
         actions.getOrderDetail(order.id);
+        console.log(user);
+
     }
 
     render() {
-        const {actions, order} = this.props;
+        const {actions, order, user} = this.props;
         return (
             <ScrollView style={styles.container}>
                 <Text style={styles.title}>
-                    Order Summary
+                    Order Summary #{order.id}
                 </Text>
                 <View style={styles.checkoutContainer}>
-                    {[1, 2, 3, 4, 5, 6].map(p => {
+                    {order.order_items.map(item => {
                         return (
                             <View style={styles.item}>
                                 <Text style={styles.itemTitle}>
-                                    Stone breaker for trekking shoes
+                                    {item.title}
                                 </Text>
                                 <Text style={styles.itemMeta}>
-                                    $123*23=$323.00
+                                    Rs. {item.price} x {item.quantity} = Rs. {item.price*item.quantity}
                                 </Text>
                             </View>
                         )
@@ -44,14 +46,14 @@ class OrderDetail extends React.Component {
                     </View>
                 </View>
                 <View style={styles.addressBox}>
-                    <Text style={styles.addName}>Priyanshu Kumar</Text>
-                    <Text style={styles.addMobile}>9876554324</Text>
-                    <Text style={styles.addCity}>Jalandhar</Text>
-                    <Text style={styles.addPincode}>897987</Text>
-                    <Text style={styles.addStreet}>Bh1, Lovely Professional University</Text>
+                    <Text style={styles.addName}>{user.fullname}</Text>
+                    <Text style={styles.addMobile}>{user.mobile}</Text>
+                    <Text style={styles.addCity}>{order.address.cityname}</Text>
+                    <Text style={styles.addPincode}>{order.address.pincode}</Text>
+                    <Text style={styles.addStreet}>{order.address.street}</Text>
                 </View>
                 <Text style={styles.status}>
-                    Dispatched
+                    {order.status}
                 </Text>
             </ScrollView>
         )
@@ -155,7 +157,8 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = (state, props) => ({
-    order: getOrder(state, props.route.params.orderId)
+    order: getOrder(state, props.route.params.orderId),
+    user: state.auth.user
 })
 
 const mapDispatchToProps = dispatch => ({
